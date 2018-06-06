@@ -20,9 +20,28 @@ $PAGE->set_pagelayout('base');
 //$PAGE->requires->css('/local/plugin01/styles.css');
 
 
+
+
+$id = required_param("rowid", PARAM_INT);
+//var_dump($id);die();
+
+$plugin01 = $DB->get_record_sql('SELECT * FROM {local_plugin01} WHERE id=?', array($id));
+//var_dump($plugin01);die();
+
+$showErrors="";
+
+if($plugin01==false)
+{$showErrors='<div class="alert alert-danger alert-dismissible">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Error!</strong> Does not exist.
+  </div>';}
+
+
+
+
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('plugin01', 'local_plugin01'));
-$content = ' plugin';
+$content = ' Plugin';
 
 class plugin01_form extends moodleform {
 
@@ -57,7 +76,6 @@ class plugin01_form extends moodleform {
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submit' , get_string('send', 'local_plugin01'));
         $buttonarray[] = $mform->createElement('cancel');
-
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
     }
 
@@ -70,7 +88,15 @@ class plugin01_form extends moodleform {
     }
 }
 
-$formular = new plugin01_form();
+$formular = new plugin01_form($CFG->wwwroot.'/local/plugin01/edit.php?rowid='.$id);
+
+$defaultdata = new \stdClass;
+$defaultdata->nume = $plugin01->nume;
+$defaultdata->prenume = $plugin01->prenume;
+$defaultdata->adresa = $plugin01->adresa;
+$defaultdata->email = $plugin01->email;
+
+$formular->set_data($defaultdata);
 
 
 if ($formular->is_cancelled()) {
@@ -78,17 +104,19 @@ if ($formular->is_cancelled()) {
 } else if ($data = $formular->get_data()) {
     //insert in DB
     $dataobject = new \stdClass();
+    $dataobject->id = $id;
     $dataobject->nume = $data->nume;
     $dataobject->prenume = $data->prenume;
     $dataobject->adresa = $data->adresa;
     $dataobject->email = $data->email;
-    $DB->insert_record('local_plugin01', $dataobject);
-    redirect($CFG->wwwroot.'/local/plugin01/index.php');
+    $DB->update_record('local_plugin01', $dataobject);
+    redirect($CFG->wwwroot.'/local/plugin01/view02.php');
 }
 
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('plugin01', 'local_plugin01'));
+echo $showErrors;
 echo $content;
 echo $formular->render();
 echo $OUTPUT->footer();

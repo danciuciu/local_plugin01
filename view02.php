@@ -19,38 +19,37 @@ $PAGE->set_heading(get_string('plugin01', 'local_plugin01'));
 $PAGE->set_pagelayout('base');
 
 
+$content='<table class="tableview02" style="width:100%;">
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('plugin01', 'local_plugin01'));
-
-
-echo '<table style="width:100%">
-      <thead>
           <tr>
             <th>Nume</th>
             <th>Prenume</th>
             <th>Adresa</th>
             <th>Email</th>
+            <th>Edit / Delete</th>
           </tr>
-        </thead>
+
 
           ';
 
 $results = $DB->get_records_sql('SELECT * FROM {local_plugin01} ');
 foreach($results as $result){
-//var_dump($result);die();
-    echo '<tr>
+
+    $content.= '<tr>
                   <td>'.$result->nume.'</td>
                   <td>'.$result->prenume.'</td>
                   <td>'.$result->adresa.'</td>
                   <td>'.$result->email.'</td>
-                  <td><a class="btn btn-default"  href="http://localhost/moodle/local/plugin01/view.php?rowid='.$result->id.'">Delete</a></td>
+                  <td><a href="http://localhost/moodle/local/plugin01/edit.php?rowid='.$result->id.'"<i  title = "Edit" class="fa fa-edit" style="padding:10px;"></a>
+                  <a href="http://localhost/moodle/local/plugin01/delete.php?rowid='.$result->id.'"<i  title = "Delete" class="fa fa-trash" style="padding:10px;"></a></td>
                 </tr>';
   //var_dump($result);die();
   }
-  echo '</table>';
+  $content.= '</table>';
 
 
-//echo $content;
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('plugin01', 'local_plugin01'));
+echo $content;
 //echo $formular->render();
 echo $OUTPUT->footer();
